@@ -1,0 +1,17 @@
+{
+  "name": "ergo-slack",
+  "version": "0.0.1",
+  "description": "Allows you to mash one key on the home row over and over again (d, for 'do it') to read all of your messages.",
+  "content_scripts": [
+    {
+      "matches": ["https://*.slack.com/*"],
+      "js": ["contentScript.js"]
+    }
+  ],
+  "web_accessible_resources": [
+    "ergoSlackInjected.js"
+  ],
+  "permissions": [
+  ],
+  "manifest_version": 2
+}
