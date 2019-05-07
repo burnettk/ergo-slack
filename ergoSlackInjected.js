@@ -41,9 +41,9 @@ function markVisibleMessagesUnread() {
   }
 }
 
-addEventListener("keydown", function(e) {
-  // console.log('keydown', e.code);
-  if (e.key === "d") {
+addEventListener("keydown", function(event) {
+  // console.log('keydown', event.code);
+  if (event.key === "d") {
     console.log('got d in ergoSlackInjected.js');
 
     // if not typing a message...
@@ -66,6 +66,7 @@ addEventListener("keydown", function(e) {
           var jiraLinkSinceItCannotShowStuffHere = $('.message_body .block_kit_error_color_bar span.sk_dark_gray').next('a')
           if (jiraLinkSinceItCannotShowStuffHere.length) {
             jiraLinkSinceItCannotShowStuffHere.first().click()
+            event.preventDefault()
             return
           }
         }
