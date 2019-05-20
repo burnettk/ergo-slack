@@ -45,8 +45,8 @@ function mainChatInputBoxEmpty() {
   return $('#msg_input .ql-editor.ql-blank').length
 }
 
-function threadChatInputBoxEmpty() {
-  return $('.p-message_input_field .ql-editor.ql-blank').length
+function threadChatInputBoxNotPresentOrEmpty() {
+  return $('.p-message_input_field').length === 0 || $('.p-message_input_field .ql-editor.ql-blank').length
 }
 
 addEventListener("keydown", function(event) {
@@ -55,7 +55,7 @@ addEventListener("keydown", function(event) {
     console.log('got d in ergoSlackInjected.js');
 
     // if not typing a message...
-    if (mainChatInputBoxEmpty() && threadChatInputBoxEmpty()) {
+    if (mainChatInputBoxEmpty() && threadChatInputBoxNotPresentOrEmpty()) {
 
       // if the big "there are new messages" button is at the top of the "All Unreads" page, click it
       if ($('#channel_header_unread_refresh').length && !$('#channel_header_unread_refresh.hidden').length) {
