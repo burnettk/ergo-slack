@@ -41,13 +41,21 @@ function markVisibleMessagesUnread() {
   }
 }
 
+function mainChatInputBoxEmpty() {
+  return $('#msg_input .ql-editor.ql-blank').length
+}
+
+function threadChatInputBoxEmpty() {
+  return $('.p-message_input_field .ql-editor.ql-blank').length
+}
+
 addEventListener("keydown", function(event) {
   // console.log('keydown', event.code);
   if (event.key === "d") {
     console.log('got d in ergoSlackInjected.js');
 
     // if not typing a message...
-    if ($('#msg_input .ql-editor.ql-blank').length) {
+    if (mainChatInputBoxEmpty() && threadChatInputBoxEmpty()) {
 
       // if the big "there are new messages" button is at the top of the "All Unreads" page, click it
       if ($('#channel_header_unread_refresh').length && !$('#channel_header_unread_refresh.hidden').length) {
