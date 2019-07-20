@@ -21,6 +21,10 @@ function logInUi(logMessage) {
   $(`<span class="hot-ui-log-message">${logMessage}</span>`).insertAfter('.p-classic_nav__channel_header__subtitle')
 }
 
+function twoUnreadChannelsAreInView() {
+  return $('.p-unreads_view__header').not('.p-unreads_view__header--was_marked').length > 1
+}
+
 function markVisibleMessagesUnread() {
   isScrolledIntoView($('ts-message.message_container_item.message').first())
   var lastVisibleMessage = null
@@ -64,25 +68,33 @@ function threadChatInputBoxNotPresentOrEmpty() {
 }
 
 function noTextBoxFocusedOrFocusedTextBoxEmpty() {
-  return $('.ql-editor.focus-ring').length === 0 || $('.ql-editor.focus-ring.ql-blank').length
+  return $('.ql-container.focus .ql-editor').length === 0 || $('.ql-container.focus .ql-editor.ql-blank').length
 }
+
+var previousBottomMessage = null
 
 addEventListener("keydown", function(event) {
   // console.log('keydown', event.code);
   if (event.key === "d") {
     console.log('DEBUG: got d in ergoSlack contentScript.js');
 
+    var shouldPreventDefault = false
     // if not typing a message...
     // if (mainChatInputBoxEmpty() && threadChatInputBoxNotPresentOrEmpty()) {
     if (noTextBoxFocusedOrFocusedTextBoxEmpty()) {
       console.log('no text box focused. proceeding')
+      shouldPreventDefault = true
 
       // if the big "there are new messages" button is at the top of the "All Unreads" page, click it
       if ($('#channel_header_unread_refresh').length && !$('#channel_header_unread_refresh.hidden').length) {
         console.log('DEBUG: clicking there are new messages button')
         $('#channel_header_unread_refresh').click()
         logInUi('f')
-
+      // if there is a big "N New Message(s) button, click it
+      } else if ($('.p-unreads_view__empty--show_new button').length) {
+        console.log('DEBUG: clicking N New Message(s) button')
+        $('.p-unreads_view__empty--show_new button').click()
+        logInUi('f')
       // if we are on the "All Unreads" page, mark the first unread channel all read
       } else if ($('[data-qa-channel-sidebar-link-id=Punreads].p-channel_sidebar__link--selected').length === 1) {
         console.log('DEBUG: looking for things to mark unread')
@@ -101,18 +113,19 @@ addEventListener("keydown", function(event) {
           }
         }
         var lastMessageInFirstUnreadChannel = unreadChannels.first().closest('.c-virtual_list__scroll_container').find('[data-qa=message_container]').last()
-        console.log('DEBUG: lastMessageInFirstUnreadChannel: ', lastMessageInFirstUnreadChannel );
-        console.log('DEBUG: lastMessageInFirstUnreadChannel text: ', lastMessageInFirstUnreadChannel.text());
         if (lastMessageInFirstUnreadChannel.length) {
           console.log('DEBUG: got lastMessageInFirstUnreadChannel')
+          console.log('DEBUG: lastMessageInFirstUnreadChannel: ', lastMessageInFirstUnreadChannel );
+          console.log('DEBUG: lastMessageInFirstUnreadChannel text: ', lastMessageInFirstUnreadChannel.text());
 
           // if we can see two channel headers that have not been marked read...
-          if ($('.p-unreads_view__header').not('.p-unreads_view__header--was_marked').length > 1) {
-          // if (isScrolledIntoView(lastMessageInFirstUnreadChannel)) {
+          if (twoUnreadChannelsAreInView() || lastMessageInFirstUnreadChannel.text() === previousBottomMessage) {
+            // if (isScrolledIntoView(lastMessageInFirstUnreadChannel)) {
             $('[data-qa=all_unreads_header_mark_read]').first().click()
             logInUi('r')
           } else {
             console.log('DEBUG: next unread channel is not in view. scrolling down')
+            previousBottomMessage = lastMessageInFirstUnreadChannel.text()
             var hotElement = lastMessageInFirstUnreadChannel[0]
             hotElement.scrollIntoView({
               behavior: "smooth",
@@ -130,8 +143,12 @@ addEventListener("keydown", function(event) {
           logInUi('c')
         }, 2000);
       } else {
-        console.log('DEBUG: nothing to do, dogg')
+        console.log('DEBUG: nothing special to do. just let the d keypress go through')
+        shouldPreventDefault = false;
       }
     }
-  }
-})
+    if (shouldPreventDefault) {
+      event.preventDefault()
+    }
+  } // end d keypress
+}) // end keydown event listener
