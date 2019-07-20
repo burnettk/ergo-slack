@@ -1,7 +1,7 @@
 // DEBUG: uncomment me
-// var script = document.createElement("script");
-// script.src = chrome.extension.getURL("jquery-3.4.1.min.js");
-// document.body.appendChild(script);
+var script = document.createElement("script");
+script.src = chrome.extension.getURL("jquery-3.4.1.min.js");
+document.body.appendChild(script);
 
 function isScrolledIntoView(elem) {
   var docViewTop = $(window).scrollTop();
@@ -11,6 +11,14 @@ function isScrolledIntoView(elem) {
   var elemBottom = elemTop + $(elem).height();
 
   return ((elemBottom <= docViewBottom) && (elemTop >= docViewTop));
+}
+
+function logInUi(logMessage) {
+  // breaks UI
+  // $(`<span>${logMessage}</span>`).insertAfter('.p-classic_nav__channel_header__title')
+
+  // not visible, but meh
+  $(`<span class="hot-ui-log-message">${logMessage}</span>`).insertAfter('.p-classic_nav__channel_header__subtitle')
 }
 
 function markVisibleMessagesUnread() {
@@ -39,7 +47,7 @@ function markVisibleMessagesUnread() {
         console.log('found button')
         // mark this message unread along with all messages above it
         $('.p-message_actions_menu__mark_unread').click()
-        $("<span>s</span>").insertAfter('#channel_name')
+        logInUi('s')
       } else {
         console.log('found button')
       }
@@ -73,7 +81,7 @@ addEventListener("keydown", function(event) {
       if ($('#channel_header_unread_refresh').length && !$('#channel_header_unread_refresh.hidden').length) {
         console.log('DEBUG: clicking there are new messages button')
         $('#channel_header_unread_refresh').click()
-        $("<span>f</span>").insertAfter('#channel_name')
+        logInUi('f')
 
       // if we are on the "All Unreads" page, mark the first unread channel all read
       } else if ($('[data-qa-channel-sidebar-link-id=Punreads].p-channel_sidebar__link--selected').length === 1) {
@@ -102,8 +110,7 @@ addEventListener("keydown", function(event) {
           if ($('.p-unreads_view__header').not('.p-unreads_view__header--was_marked').length > 1) {
           // if (isScrolledIntoView(lastMessageInFirstUnreadChannel)) {
             $('[data-qa=all_unreads_header_mark_read]').first().click()
-
-            $("<span>r</span>").insertAfter('#channel_name')
+            logInUi('r')
           } else {
             console.log('DEBUG: next unread channel is not in view. scrolling down')
             var hotElement = lastMessageInFirstUnreadChannel[0]
@@ -118,9 +125,9 @@ addEventListener("keydown", function(event) {
       // if we are not on the "All Unreads" page, go there
       } else if ($('[data-qa-channel-sidebar-link-id=Punreads]').length === 1 ) {
         console.log('DEBUG: not on all unreads page. going there')
-        $('.p-channel_sidebar__link--all-unreads.p-channel_sidebar__link--unread').click()
+        $('[data-qa-channel-sidebar-link-id=Punreads]').click()
         setTimeout(function() {
-          $("<span>c</span>").insertAfter('#channel_name')
+          logInUi('c')
         }, 2000);
       } else {
         console.log('DEBUG: nothing to do, dogg')
@@ -128,5 +135,3 @@ addEventListener("keydown", function(event) {
     }
   }
 })
-
-console.log('hey3')
