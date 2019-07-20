@@ -12,6 +12,7 @@
     "ergoSlackInjected.js",
     "jquery-3.4.1.min.js"
   ],
+  "background": { "scripts": ["hot-reload.js"] },
   "permissions": [
   ],
   "manifest_version": 2

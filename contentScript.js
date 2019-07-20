@@ -1,14 +1,7 @@
-console.log('hey111111')
-// chrome.tabs.executeScript(null, { file: "jquery-3.4.1.min.js" }, function() {
-//   chrome.tabs.executeScript(null, { file: "ergoSlackInjected.js" });
-// });
-
+// DEBUG: uncomment me
 // var script = document.createElement("script");
-// script.src = chrome.extension.getURL("ergoSlackInjected.js");
+// script.src = chrome.extension.getURL("jquery-3.4.1.min.js");
 // document.body.appendChild(script);
-
-// $ is not defined in contentScript.js, but it is in ergoSlackInjected.js
-console.log('hey2')
 
 function isScrolledIntoView(elem) {
   var docViewTop = $(window).scrollTop();
@@ -37,7 +30,8 @@ function markVisibleMessagesUnread() {
   }); null
 
   if (lastVisibleMessage) {
-    // open menu for message
+    // open menu for message. this isn't actually possible since you have to hover
+    // for the menu to appear. not sure if there's an easy way to simulate a hover.
     console.log('clicking menu')
     $(`#${lastVisibleMessage.id} .btn_msg_action.ts_icon_small_ellipsis`).click()
     setTimeout(function() {
@@ -68,23 +62,26 @@ function noTextBoxFocusedOrFocusedTextBoxEmpty() {
 addEventListener("keydown", function(event) {
   // console.log('keydown', event.code);
   if (event.key === "d") {
-    console.log('got d in ergoSlackInjected.js');
+    console.log('DEBUG: got d in ergoSlack contentScript.js');
 
     // if not typing a message...
     // if (mainChatInputBoxEmpty() && threadChatInputBoxNotPresentOrEmpty()) {
     if (noTextBoxFocusedOrFocusedTextBoxEmpty()) {
+      console.log('no text box focused. proceeding')
 
       // if the big "there are new messages" button is at the top of the "All Unreads" page, click it
       if ($('#channel_header_unread_refresh').length && !$('#channel_header_unread_refresh.hidden').length) {
+        console.log('DEBUG: clicking there are new messages button')
         $('#channel_header_unread_refresh').click()
         $("<span>f</span>").insertAfter('#channel_name')
 
       // if we are on the "All Unreads" page, mark the first unread channel all read
-      } else if ($('.p-channel_sidebar__link--all-unreads.p-channel_sidebar__link--selected.p-channel_sidebar__link--unread').length === 1) {
-        console.log('looking for things to mark unread')
+      } else if ($('[data-qa-channel-sidebar-link-id=Punreads].p-channel_sidebar__link--selected').length === 1) {
+        console.log('DEBUG: looking for things to mark unread')
         // markVisibleMessagesUnread()
-        //
-        var unreadChannels = $('.unread_group').not('.marked_as_read').not('.collapsed')
+
+        var unreadChannels = $('.p-unreads_view__header').not('.p-unreads_view__header--was_marked')
+        // .not('.collapsed')
 
         // special case. if the last unread channel has a jira link, go there, since that is the only way to view the jira content
         if (unreadChannels.length === 1) {
@@ -95,17 +92,22 @@ addEventListener("keydown", function(event) {
             return
           }
         }
-        var lastMessageInFirstUnreadChannel = unreadChannels.first().find('.message').last()
-        console.log('lastMessageInFirstUnreadChannel: ',lastMessageInFirstUnreadChannel );
+        var lastMessageInFirstUnreadChannel = unreadChannels.first().closest('.c-virtual_list__scroll_container').find('[data-qa=message_container]').last()
+        console.log('DEBUG: lastMessageInFirstUnreadChannel: ', lastMessageInFirstUnreadChannel );
+        console.log('DEBUG: lastMessageInFirstUnreadChannel text: ', lastMessageInFirstUnreadChannel.text());
         if (lastMessageInFirstUnreadChannel.length) {
-          if (isScrolledIntoView(lastMessageInFirstUnreadChannel)) {
-            console.log('in view')
-            $('.unread_group_mark').first().click()
+          console.log('DEBUG: got lastMessageInFirstUnreadChannel')
+
+          // if we can see two channel headers that have not been marked read...
+          if ($('.p-unreads_view__header').not('.p-unreads_view__header--was_marked').length > 1) {
+          // if (isScrolledIntoView(lastMessageInFirstUnreadChannel)) {
+            $('[data-qa=all_unreads_header_mark_read]').first().click()
+
             $("<span>r</span>").insertAfter('#channel_name')
           } else {
-            console.log('not in view. scrolling')
-            console.log('lastMessageInFirstUnreadChannel: ',lastMessageInFirstUnreadChannel[0].id );
-            document.querySelector(`#${lastMessageInFirstUnreadChannel[0].id}`).scrollIntoView({
+            console.log('DEBUG: next unread channel is not in view. scrolling down')
+            var hotElement = lastMessageInFirstUnreadChannel[0]
+            hotElement.scrollIntoView({
               behavior: "smooth",
               block: "end",
               inline: "nearest"
@@ -114,11 +116,14 @@ addEventListener("keydown", function(event) {
         }
 
       // if we are not on the "All Unreads" page, go there
-      } else if ($('.p-channel_sidebar__link--all-unreads.p-channel_sidebar__link--unread').length === 1 ) {
+      } else if ($('[data-qa-channel-sidebar-link-id=Punreads]').length === 1 ) {
+        console.log('DEBUG: not on all unreads page. going there')
         $('.p-channel_sidebar__link--all-unreads.p-channel_sidebar__link--unread').click()
         setTimeout(function() {
           $("<span>c</span>").insertAfter('#channel_name')
         }, 2000);
+      } else {
+        console.log('DEBUG: nothing to do, dogg')
       }
     }
   }
