@@ -5,11 +5,12 @@
   "content_scripts": [
     {
       "matches": ["https://*.slack.com/*"],
-      "js": ["contentScript.js"]
+      "js": ["jquery-3.4.1.min.js", "contentScript.js"]
     }
   ],
   "web_accessible_resources": [
-    "ergoSlackInjected.js"
+    "ergoSlackInjected.js",
+    "jquery-3.4.1.min.js"
   ],
   "permissions": [
   ],
