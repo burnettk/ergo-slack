@@ -95,6 +95,13 @@ addEventListener("keydown", function(event) {
         console.log('DEBUG: clicking N New Message(s) button')
         $('.p-unreads_view__empty--show_new button').click()
         logInUi('f')
+      // if there are unread messages in Threads, go there
+      } else if ($('[data-qa-channel-sidebar-link-id=Vall_threads].p-channel_sidebar__link--unread').length === 1 ) {
+        console.log('DEBUG: clicking to get unread Threads')
+        $('[data-qa-channel-sidebar-link-id=Vall_threads].p-channel_sidebar__link--unread').click()
+        setTimeout(function() {
+          logInUi('t')
+        }, 2000);
       // if we are on the "All Unreads" page, mark the first unread channel all read
       } else if ($('[data-qa-channel-sidebar-link-id=Punreads].p-channel_sidebar__link--selected').length === 1) {
         console.log('DEBUG: looking for things to mark unread')
