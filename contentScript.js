@@ -134,8 +134,12 @@ addEventListener("keydown", function(event) {
           // if we can see two channel headers that have not been marked read...
           if (twoUnreadChannelsAreInView() || lastMessageInFirstUnreadChannel.text() === previousBottomMessage) {
             // if (isScrolledIntoView(lastMessageInFirstUnreadChannel)) {
+            var channelName = $('[data-qa=all_unreads_header_mark_read]').first().closest('.p-unreads_view__header').find('[data-qa=channel_name_header]').text()
+            if (channelName !== '') {
+              channelName = ' ' + channelName
+            }
             $('[data-qa=all_unreads_header_mark_read]').first().click()
-            logInUi('Marked all messages in channel read')
+            logInUi(`Marked all messages in${channelName} channel read`)
           } else {
             console.log('DEBUG: next unread channel is not in view. scrolling down')
             previousBottomMessage = lastMessageInFirstUnreadChannel.text()
