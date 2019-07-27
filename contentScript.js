@@ -18,7 +18,8 @@ function logInUi(logMessage) {
   // $(`<span>${logMessage}</span>`).insertAfter('.p-classic_nav__channel_header__title')
 
   // not visible, but meh
-  $(`<span class="hot-ui-log-message">${logMessage}</span>`).insertAfter('.p-classic_nav__channel_header__subtitle')
+  $('.hot-ui-log-message').remove()
+  $(`<div style="float: right; top: 9px; position: relative; right: 2px;" class="hot-ui-log-message">${logMessage}</div>`).insertAfter('.p-classic_nav__channel_header__title_section')
 }
 
 function twoUnreadChannelsAreInView() {
@@ -51,7 +52,7 @@ function markVisibleMessagesUnread() {
         console.log('found button')
         // mark this message unread along with all messages above it
         $('.p-message_actions_menu__mark_unread').click()
-        logInUi('s')
+        logInUi('Marked specific messages unreaded')
       } else {
         console.log('found button')
       }
@@ -89,18 +90,23 @@ addEventListener("keydown", function(event) {
       if ($('#channel_header_unread_refresh').length && !$('#channel_header_unread_refresh.hidden').length) {
         console.log('DEBUG: clicking there are new messages button')
         $('#channel_header_unread_refresh').click()
-        logInUi('f')
-      // if there is a big "N New Message(s) button, click it
+        logInUi('Refreshed via new messages button at top of All Unreads page')
+      // if there is a big "N New Message(s) button in the middle of the All Unreads page, click it
       } else if ($('.p-unreads_view__empty--show_new button').length) {
-        console.log('DEBUG: clicking N New Message(s) button')
+        console.log('DEBUG: clicking middle N New Message(s) button')
+        logInUi('Refreshed by clicking middle New Message(s) button on All Unreads page')
         $('.p-unreads_view__empty--show_new button').click()
-        logInUi('f')
+      // if there is an "N new message(s) button at the top of the All Unreads page, click it
+      } else if ($('.p-classic_nav__channel_header__refresh_button button').length) {
+        console.log('DEBUG: clicking top N new message(s) button')
+        $('.p-classic_nav__channel_header__refresh_button button').click()
+        logInUi('Refreshed by clicking N new message(s) button at top of All Unreads page')
       // if there are unread messages in Threads, go there
       } else if ($('[data-qa-channel-sidebar-link-id=Vall_threads].p-channel_sidebar__link--unread').length === 1 ) {
         console.log('DEBUG: clicking to get unread Threads')
         $('[data-qa-channel-sidebar-link-id=Vall_threads].p-channel_sidebar__link--unread').click()
         setTimeout(function() {
-          logInUi('t')
+          logInUi('Viewed unread messages in Threads')
         }, 2000);
       // if we are on the "All Unreads" page, mark the first unread channel all read
       } else if ($('[data-qa-channel-sidebar-link-id=Punreads].p-channel_sidebar__link--selected').length === 1) {
@@ -129,7 +135,7 @@ addEventListener("keydown", function(event) {
           if (twoUnreadChannelsAreInView() || lastMessageInFirstUnreadChannel.text() === previousBottomMessage) {
             // if (isScrolledIntoView(lastMessageInFirstUnreadChannel)) {
             $('[data-qa=all_unreads_header_mark_read]').first().click()
-            logInUi('r')
+            logInUi('Marked all messages in channel read')
           } else {
             console.log('DEBUG: next unread channel is not in view. scrolling down')
             previousBottomMessage = lastMessageInFirstUnreadChannel.text()
@@ -139,6 +145,7 @@ addEventListener("keydown", function(event) {
               block: "end",
               inline: "nearest"
             });
+            logInUi('Scrolled down since next unread channel was not in view')
           }
         }
 
@@ -147,7 +154,7 @@ addEventListener("keydown", function(event) {
         console.log('DEBUG: not on all unreads page. going there')
         $('[data-qa-channel-sidebar-link-id=Punreads]').click()
         setTimeout(function() {
-          logInUi('c')
+          logInUi('Went to All Unreads page')
         }, 2000);
       } else {
         console.log('DEBUG: nothing special to do. just let the d keypress go through')
