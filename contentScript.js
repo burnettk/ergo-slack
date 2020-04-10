@@ -13,13 +13,10 @@ function isScrolledIntoView(elem) {
   return ((elemBottom <= docViewBottom) && (elemTop >= docViewTop));
 }
 
+// this is designed to help debug and increase usability by telling you what the shortcut you initiated is actually doing
 function logInUi(logMessage) {
-  // breaks UI
-  // $(`<span>${logMessage}</span>`).insertAfter('.p-classic_nav__channel_header__title')
-
-  // not visible, but meh
   $('.hot-ui-log-message').remove()
-  $(`<div style="float: right; top: 9px; position: relative; right: 2px;" class="hot-ui-log-message">${logMessage}</div>`).insertAfter('.p-classic_nav__channel_header__title_section')
+  $(`<div style="float: right; top: 9px; position: relative; right: 2px;" class="hot-ui-log-message">${logMessage}</div>`).insertBefore('.p-top_nav__sidebar')
 }
 
 function twoUnreadChannelsAreInView() {
@@ -73,6 +70,7 @@ function noTextBoxFocusedOrFocusedTextBoxEmpty() {
 }
 
 var previousBottomMessage = null
+var lastShortcutInitiatedAt = null
 
 addEventListener("keydown", function(event) {
   // console.log('keydown', event.code);
@@ -85,6 +83,12 @@ addEventListener("keydown", function(event) {
     if (noTextBoxFocusedOrFocusedTextBoxEmpty()) {
       console.log('no text box focused. proceeding')
       shouldPreventDefault = true
+
+      // the last shortcut action was initiated very recently. suppress this new one to avoid accidental "power clicking"
+      if (lastShortcutInitiatedAt && (Math.abs(new Date() - lastShortcutInitiatedAt) < 700)) {
+        return;
+      }
+      lastShortcutInitiatedAt = new Date();
 
       // if there is a little message at the bottom of a channel on the All Unreads view that says "N new message(s)", click it
       if ($('.c-link--button.p-unreads_view__show_newer').length) {

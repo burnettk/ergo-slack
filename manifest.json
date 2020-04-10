@@ -11,7 +11,7 @@
   "web_accessible_resources": [
     "jquery-3.4.1.min.js"
   ],
-  "background": { "scripts": [] },
+  "background": { "scripts": ["hot-reload.js"] },
   "permissions": [
   ],
   "browser_action": {
