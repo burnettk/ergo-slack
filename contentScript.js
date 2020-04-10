@@ -86,8 +86,12 @@ addEventListener("keydown", function(event) {
       console.log('no text box focused. proceeding')
       shouldPreventDefault = true
 
+      // if there is a little message at the bottom of a channel on the All Unreads view that says "N new message(s)", click it
+      if ($('.c-link--button.p-unreads_view__show_newer').length) {
+        $('.c-link--button.p-unreads_view__show_newer').click()
+        console.log('DEBUG: clicked N new message(s) link at bottom of channel')
       // if the big "there are new messages" button is at the top of the "All Unreads" page, click it
-      if ($('#channel_header_unread_refresh').length && !$('#channel_header_unread_refresh.hidden').length) {
+      } else if ($('#channel_header_unread_refresh').length && !$('#channel_header_unread_refresh.hidden').length) {
         console.log('DEBUG: clicking there are new messages button')
         $('#channel_header_unread_refresh').click()
         logInUi('Refreshed via new messages button at top of All Unreads page')
@@ -149,7 +153,31 @@ addEventListener("keydown", function(event) {
               block: "end",
               inline: "nearest"
             });
-            logInUi('Scrolled down since next unread channel was not in view')
+            var scrollableElement = $('[aria-label="All Unreads, sorted scientifically"] .c-scrollbar__hider')
+            if (scrollableElement.length === 1) {
+              var htmlElement = scrollableElement[0]
+              var currentScrollTop = htmlElement.scrollTop
+              var heightOfContainer = $('[aria-label="All Unreads, sorted scientifically"]').height()
+
+              var scrollIt = function() {
+                console.log('scrolling');
+                logInUi(`Scrolled down by ${heightOfContainer} since next unread channel was not in view`)
+                // logInUi(`Scrolled down by ${heightOfContainer} since next unread channel was not in view: ${new Date()}`)
+                // logInUi(`Scrolled down`)
+                htmlElement.scroll({
+                  top: currentScrollTop + heightOfContainer,
+                  left: 0,
+                  behavior: 'smooth'
+                });
+              }
+              var times = 4;
+              for(var i=0; i < times; i++){
+                window.setTimeout ( scrollIt, i * 2000);
+              }
+
+            } else {
+              logInUi('Scrolled down to last message in dom since next unread channel was not in view')
+            }
           }
         }
 
